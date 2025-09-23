@@ -6,11 +6,9 @@ import { fetchRevenue, fetchLatestInvoices, fetchCardData } from '@/app/lib/data
 
 export default async function Page() {
   // Fetch all required data
-  const [revenue, latestInvoices, cardData] = await Promise.all([
-  fetchRevenue(),
-  fetchLatestInvoices(),
-  fetchCardData()
-]);
+  const revenue = await fetchRevenue();
+  const latestInvoices = await fetchLatestInvoices();
+  const cardData = await fetchCardData();
 
   return (
     <main className="p-6">
