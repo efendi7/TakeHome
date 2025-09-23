@@ -114,15 +114,15 @@ export async function updateInvoice(
 }
 
 // DELETE INVOICE (CORRECTED)
-export async function deleteInvoice(id: string) {
+export async function deleteInvoice(id: string): Promise<void> {
   try {
     await sql`DELETE FROM invoices WHERE id = ${id}`;
-    // By not returning anything on success, we satisfy the type expected by the form action.
-    // The revalidatePath function will trigger a re-render with the updated data.
     revalidatePath('/dashboard/invoices');
   } catch (error) {
-    // The error path can still return a message for debugging or display purposes.
-    return { message: 'Database Error: Failed to Delete Invoice.' };
+    // Log the error for debugging purposes
+    console.error('Database Error: Failed to Delete Invoice.', error);
+    // For form actions, we should throw an error instead of returning a message
+    throw new Error('Database Error: Failed to Delete Invoice.');
   }
 }
 
