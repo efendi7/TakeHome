@@ -4,12 +4,15 @@ import { fetchInvoiceById, fetchCustomers } from '@/app/lib/data';
 import { notFound } from 'next/navigation';
 import { Metadata } from 'next';
 
-type Props = {
-  params: { id: string };
-};
+// Define interface for the page props with Promise-based params
+interface PageProps {
+  params: Promise<{ id: string }>;
+}
 
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const id = params.id;
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  // Await the params Promise to get the actual values
+  const resolvedParams = await params;
+  const id = resolvedParams.id;
   
   try {
     const [invoice, customers] = await Promise.all([
@@ -38,8 +41,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 }
 
-export default async function Page({ params }: { params: { id: string } }) {
-  const id = params.id;
+// Use the same PageProps interface for consistency
+export default async function Page({ params }: PageProps) {
+  // Await the params Promise to get the actual values
+  const resolvedParams = await params;
+  const id = resolvedParams.id;
 
   const [invoice, customers] = await Promise.all([
     fetchInvoiceById(id),
