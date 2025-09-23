@@ -9,7 +9,7 @@ import { AuthError } from 'next-auth';
 
 const sql = postgres(process.env.POSTGRES_URL!, { ssl: 'require' });
 
-// Validasi form dengan Zod
+// Validation schema using Zod
 const FormSchema = z.object({
   id: z.string(),
   customerId: z
@@ -31,9 +31,7 @@ const FormSchema = z.object({
   date: z.string(),
 });
 
-// Untuk create
 const CreateInvoice = FormSchema.omit({ id: true, date: true });
-// Untuk update
 const UpdateInvoice = FormSchema.omit({ date: true, id: true });
 
 export type State = {
@@ -115,13 +113,15 @@ export async function updateInvoice(
   redirect('/dashboard/invoices');
 }
 
-// DELETE INVOICE
+// DELETE INVOICE (CORRECTED)
 export async function deleteInvoice(id: string) {
   try {
     await sql`DELETE FROM invoices WHERE id = ${id}`;
+    // By not returning anything on success, we satisfy the type expected by the form action.
+    // The revalidatePath function will trigger a re-render with the updated data.
     revalidatePath('/dashboard/invoices');
-    return { message: 'Deleted Invoice.' };
   } catch (error) {
+    // The error path can still return a message for debugging or display purposes.
     return { message: 'Database Error: Failed to Delete Invoice.' };
   }
 }
@@ -145,4 +145,3 @@ export async function authenticate(
     throw error;
   }
 }
-
